@@ -1,0 +1,169 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% if status == 200 %}
+        <!--============================= RESERVE A SEAT =============================-->
+        <section class="reserve-block">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>{{ place.name }}</h5>
+                    </div>
+                    <div class="col-md-6">
+                            <div class="reserve-seat-block">
+                                {% if place.rating is defined %}
+                                <div class="reserve-rating">
+                                    <span>{{ place.rating }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="review-btn">
+                                    {% if place.stats.visitsCount is defined %}
+                                        <a href="#" class="btn btn-outline-danger">Visitas: {{ place.stats.visitsCount }}</a>
+                                    {% endif %}
+                                    {% if place.likes.summary is defined %}
+                                        <span>{{ place.likes.summary }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="reserve-btn">
+                                    <div class="featured-btn-wrap">
+                                        <a href="#" class="btn btn-danger add-favorites" data-place="{{ place.id }}"><span class="ti-plus"></span> FAVORITOS</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </section>
+        <!--//END RESERVE A SEAT -->
+        <!--============================= BOOKING DETAILS =============================-->
+        <section class="light-bg booking-details_wrap">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 responsive-wrap">
+                        <!--============================= BOOKING =============================-->
+                        <div>
+                            {% if place.photos.groups[0].items is defined %}
+                            <!-- Swiper -->
+                            <div class="swiper-container">
+                                <div class="swiper-wrapper">
+                                    {% for photo in place.photos.groups[0].items %}
+                                        <div class="swiper-slide">
+                                            <img src="{{ photo.prefix~photo.width~'x'~photo.height~photo.suffix }}" style="height: 300px; width: 100%;" class="" alt="{{ place.name~' '~photo.createdAt }}">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <!-- Add Pagination -->
+                                <div class="swiper-pagination swiper-pagination-white"></div>
+                                <!-- Add Arrows -->
+                                <div class="swiper-button-next swiper-button-white"></div>
+                                <div class="swiper-button-prev swiper-button-white"></div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <!--//END BOOKING -->
+                        <div class="booking-checkbox_wrap">
+                            {% if place.description is defined %}
+                            <div class="booking-checkbox">
+                                <p>{{ place.description }}</p>
+                                <hr>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4 responsive-wrap">
+                        <div class="contact-info">
+                            <div class="map-details" id="map" style="height: 200px; width: auto;"></div>
+                            <div class="address">
+                                <span class="icon-check"></span>
+                                <p>Categorias:
+                                {% for category in place.categories %}
+                                    {{ category.name~'. ' }}
+                                {% endfor %}</p>
+                            </div>
+                            <div class="address">
+                                <span class="icon-location-pin"></span>
+                                <p>{{ place.location.formattedAddress[0] }}</p>
+                            </div>
+                            {% if place.contact.formattedPhone is defined %}
+                                <div class="address">
+                                    <span class="icon-screen-smartphone"></span>
+                                    <p> {{ place.contact.formattedPhone }}</p>
+                                </div>
+                            {% endif %}
+                            {% if place.url is defined %}
+                                <div class="address">
+                                    <span class="icon-link"></span>
+                                    <p>{{ place.url }}</p>
+                                </div>
+                            {% endif %}
+                            {% if place.contact.twitter is defined %}
+                                <div class="address">
+                                    <span class="icon-social-twitter"></span>
+                                    <p> {{ place.contact.twitter }}</p>
+                                </div>
+                            {% endif %}
+                            {% if place.contact.instagram is defined %}
+                                <div class="address">
+                                    <span class="icon-screen-instagram"></span>
+                                    <p> {{ place.contact.instagram }}</p>
+                                </div>
+                            {% endif %}
+                            {% if place.contact.facebookName is defined %}
+                                <div class="address">
+                                    <span class="icon-social-facebook"></span>
+                                    <p> {{ place.contact.facebookName }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!--//END BOOKING DETAILS -->
+    {% else %}
+        <p>Ocurrió un error, intente de nuevo.</p>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    <!-- Swipper Slider JS -->
+    <script src="{{ asset('js/swiper.min.js') }}"></script>
+    <script>
+        var swiper = new Swiper('.swiper-container', {
+            slidesPerView: 2,
+            slidesPerGroup: 2,
+            loop: true,
+            loopFillGroupWithBlank: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+    </script>
+    <script>
+        function initMap() {
+            {% if place.location.lat is defined %}
+            var lat = {{ place.location.lat }};
+            var lng = {{ place.location.lng }};
+            var uluru = {lat: lat, lng: lng};
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 14,
+                center: uluru
+            });
+            var marker = new google.maps.Marker({
+                position: uluru,
+                map: map
+            });
+            {% endif %}
+        }
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4UHVxHKRbrG2Go-iHZKjxg1fEVA8ivlU&callback=initMap">
+    </script>
+
+{% endblock %}

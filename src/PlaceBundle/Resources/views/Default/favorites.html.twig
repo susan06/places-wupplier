@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <!--============================= FEATURED PLACES =============================-->
+    <section class="main-block light-bg">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <div class="styled-heading">
+                        <h3>Favoritos</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                {% if places | length == 0 %}
+                    <p class="text-center">No ha registrado lugares favoritos aún.</p>
+                {% endif %}
+                {% for place in places %}
+                    <div class="col-md-4 featured-responsive">
+                    <div class="featured-place-wrap">
+                        <a href="{{ path('details', {'id': place.id}) }}" class="link-page">
+                            {% if place.photos.groups[0].items[0] is defined %}
+                                 <img class="img-fluid" style="height: 300px;" src="{{ place.photos.groups[0].items[0].prefix~place.photos.groups[0].items[0].width~'x'~place.photos.groups[0].items[0].height~place.photos.groups[0].items[0].suffix }}" alt="#">
+                            {% else %}
+                               <img src="{{ asset('images/featured1.jpg') }}" class="img-fluid" alt="#">
+                            {% endif %}
+                            <div class="featured-title-box">
+                                <h6>{{ place.name }}</h6>
+                                <p>{% for category in place.categories %}
+                                        {{ category.name~' ' }}
+                                    {% endfor %}<span>• </span></p>
+                                <ul>
+                                    <li><span class="icon-location-pin"></span>
+                                        <p>{{ place.location.formattedAddress[0] }}</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {%endfor%}
+            </div>
+        </div>
+    </section>
+    <!--//END FEATURED PLACES -->
+{% endblock %}

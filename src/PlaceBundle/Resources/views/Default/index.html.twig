@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <!-- SLIDER -->
+    <section class="slider d-flex align-items-center">
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-12">
+                    <div class="slider-title_box">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="slider-content_wrap">
+                                    <h1>Encuentra el lugar mas cerca de ti</h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row d-flex justify-content-center">
+                            <div class="col-md-10">
+                                {{ form_start(form, {'attr': {'class': 'form-wrap mt-4'}}) }}
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    {{ form_widget(form) }}
+                                    {{ form_errors(form) }}
+                                </div>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--// SLIDER -->
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript" language="javascript">
+        $('.fixed').removeClass('is-sticky');
+        $('#top-menu').addClass('nav-menu');
+        $('#top-menu').removeClass('dark-bg sticky-top');
+        $(window).scroll(function() {
+            if ($(window).scrollTop() > 100) {
+                $('.fixed').addClass('is-sticky');
+            } else {
+                $('.fixed').removeClass('is-sticky');
+
+            };
+        });
+
+        function initGeolocation() {
+            document.getElementById('placebundle_location_Buscar').disabled = true;
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var response = getCoordinates(position);
+                document.getElementById("placebundle_location_lat").value = response.lat;
+                document.getElementById("placebundle_location_lng").value = response.lng;
+                document.getElementById('placebundle_location_Buscar').disabled = false;
+            }, function (error) {
+               var response = showError();
+                notify(response.message, "error");
+                document.getElementById('placebundle_location_Buscar').disabled = true;
+            })
+        }
+
+        var initGeolocation = initGeolocation();
+    </script>
+{% endblock %}

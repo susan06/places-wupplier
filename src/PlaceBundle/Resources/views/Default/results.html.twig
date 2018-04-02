@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <!--============================= DETAIL =============================-->
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-7 responsive-wrap">
+                    <div class="row detail-filter-wrap">
+                        <div class="col-md-12 featured-responsive">
+                            <div class="detail-filter-text">
+                                {% if status == 200 %}
+                                    <p>
+                                        {{ places|length }} Resultados de la Búsqueda por: <span>{{ term }}</span>.
+                                        {% if places|length > 0 %}
+                                            {% if places[0].location.formattedAddress[1] is defined %}
+                                                Cerca de: {{ places[0].location.formattedAddress[1] }}
+                                            {% endif %}
+                                        {% endif %}
+                                    </p>
+                                {% else %}
+                                    <p>Ocurrió un error, intente de nuevo.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row light-bg detail-options-wrap">
+                        {% for place in places %}
+                            <div class="col-sm-4 col-lg-12 col-xl-4 featured-responsive">
+                            <div class="featured-place-wrap">
+                                <a href="{{ path('details', {'id': place.id}) }}" class="link-page">
+                                    {% set position = position + 1%}
+                                    <img src="{{ asset('images/load.gif') }}" style="height: 200px;" class="img-fluid" id="place-{{ position }}" alt="place-{{ position }}">
+                                    <span class="featured-rating-orange">{{ position }}</span>
+                                </a>
+                                    <div class="featured-title-box">
+                                        <h6>{{ place.name }}</h6>
+                                        <p>
+                                        Categorias:
+                                        {% for category in place.categories %}
+                                            {{ category.name~'. ' }}<span>• </span>
+                                        {% endfor %}
+                                        </p>
+                                        <ul>
+                                            <li><span class="icon-location-pin"></span>
+                                                <p>Dirección: {{ place.location.formattedAddress[0] }}</p>
+                                            </li>
+                                        </ul>
+                                        <div class="bottom-icons">
+                                            <span class="ti-heart add-favorites cursor" data-place="{{ place.id }}"></span>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-5 responsive-wrap map-wrap">
+                    <div class="map-fix">
+                        <!-- data-toggle="affix" -->
+                        <!-- Google map will appear here! Edit the Latitude, Longitude and Zoom Level below using data-attr-*  -->
+                        <div id="map"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--//END DETAIL -->
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+
+        function getPhoto(place_id, position) {
+            $.ajax({
+                type: 'get',
+                url: "{{ path('photos') }}",
+                data: {id: place_id},
+                dataType: 'json',
+                success: function (response) {
+                    document.getElementById("place-"+position).src = response;
+                }
+            });
+        }
+
+        function initMap() {
+            lat_global = {{ location.lat }};
+            lng_global = {{ location.lng }};
+            var uluru = {lat: lat_global, lng: lng_global};
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 14,
+                center: uluru
+            });
+            var marker = new google.maps.Marker({
+                position: uluru,
+                map: map,
+                title: 'Aqui Estoy!',
+            });
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            var position = 1;
+            {% for place in places %}
+                getPhoto('{{ place.id }}', position);
+                var location = {lat: {{ place.location.lat }}, lng: {{ place.location.lng}}};
+                var marker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    label: " "+position+" ",
+                    title: "{{ place.name }}",
+                    url: "{{ path('details', {'id': place.id}) }}"
+                });
+                google.maps.event.addListener(marker, 'click', function() {
+                    window.location.href = this.url;
+                });
+                position++;
+            {% endfor %}
+        }
+
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4UHVxHKRbrG2Go-iHZKjxg1fEVA8ivlU&callback=initMap">
+    </script>
+{% endblock %}

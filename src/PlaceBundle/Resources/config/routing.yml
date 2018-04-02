@@ -1,0 +1,23 @@
+place_homepage:
+    path:     /
+    defaults: { _controller: PlaceBundle:Default:index }
+
+search:
+    path:     /search
+    defaults: { _controller: PlaceBundle:Default:search }
+
+details:
+    path:     /details/{id}
+    defaults: { _controller: PlaceBundle:Default:details }
+
+add_favorites:
+    path:     /favorites/add
+    defaults: { _controller: PlaceBundle:Default:addFavorites }
+
+favorites:
+    path:     /favorites
+    defaults: { _controller: PlaceBundle:Default:favorites }
+
+photos:
+    path:     /photos
+    defaults: { _controller: PlaceBundle:Default:photos }
